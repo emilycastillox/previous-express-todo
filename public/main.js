@@ -1,65 +1,84 @@
-// document.querySelector('#addList').addEventListener('click', createItem)
-document.querySelector('#endAll').addEventListener('click', clearAll)
-document.querySelector('#endComplete').addEventListener('click', clearComplete)
-document.querySelector('.checked').addEventListener('click', checked)
+// var thumbUp = document.getElementsByClassName("fa-thumbs-up");
+var trash = document.getElementsByClassName("fa-trash");
+var check = document.getElementsByClassName("fa-check");
 
-const input = document.querySelector('#task')
-const ul = document.querySelector('#toDo')
-const add = document.querySelector('#addList')
-const amount = document.querySelector('#amount')
-
-function checked(e) {
-    const itemName = e.target.getAttribute('name')
-    // const itemName = el.getAttribute('name')
-    console.log(itemName, 'hello')
-    fetch('done', {
-        method: 'put',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-            'name': itemName,
+Array.from(check).forEach(function(element) {
+      element.addEventListener('click', function(e){
+        e.preventDefault()
+        const date = this.parentNode.parentNode.childNodes[1].innerText
+        const msg = this.parentNode.parentNode.childNodes[3].innerText
+        // msg is coming back undefined***
+        console.log(msg)
+        console.log(date)
+        const complete = e.target.classList.contains('grey') ? true : false
+      
+        fetch('complete', {
+          method: 'put',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({
+            'date': date,
+            'msg': msg,
+            'completed': complete,
+            // passing these keys names to the server
+          })
         })
-    })
-}
-
-
-function submit(value, index) {
-    console.log('hello')
-    console.log(value)
-    console.log(index)
-    const el = document.getElementById(index)
-    console.log(el.getAttribute('name'))
-    const itemName = el.getAttribute('name')
-    const itemValue = el.getAttribute('value')
-    fetch('done', {
-        method: 'put',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-            'name': itemName,
-            'value': itemValue
+        .then(response => {
+          if (response.ok) return response.json()
         })
-    })
-}
+        .then(data => {
+          console.log(data)
+          window.location.reload(true)
+        })
+       });
+});
 
-function clearAll() {
+// Array.from(thumbDown).forEach(function(element) {
+//   // turn node list into array
+//       element.addEventListener('click', function(){
+//         //add event listener to each traschcan
+        
+//         const name = this.parentNode.parentNode.childNodes[1].innerText
+//         //grab the name
+//         const msg = this.parentNode.parentNode.childNodes[3].innerText
+//         // grab the message
+//         const thumbDown = parseFloat(this.parentNode.parentNode.childNodes[5].innerText)
+//         fetch('messagesDown', {
+//           method: 'put',
+//           headers: {'Content-Type': 'application/json'},
+//           body: JSON.stringify({
+//             'name': name,
+//             'msg': msg,
+//             'thumbUp':thumbDown
+//             // calling on the same property with a different value
+//           })
+//         })
+//         .then(response => {
+//           if (response.ok) return response.json()
+//         })
+//         .then(data => {
+//           console.log(data)
+//           window.location.reload(true)
+//         })
+//       });
+// });
 
-    fetch('clear', {
-        method: 'delete',
-        headers: {
-            'Content-Type': 'application/json'
-        },
+
+Array.from(trash).forEach(function(element) {
+  element.addEventListener('click', function(){
+    const date = this.parentNode.parentNode.childNodes[1].innerText
+    const msg = this.parentNode.parentNode.childNodes[3].innerText
+    fetch('items', {
+      // fetch the form name in the index.js
+      method: 'delete',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        'date': date,
+        'msg': msg
+      })
     }).then(function (response) {
-        window.location.reload()
+      window.location.reload()
     })
-};
-
-//doesn't work
-function clearComplete() {
-    fetch('clearCompleted', {
-        method: 'delete',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-    }).then(function (response) {
-        window.location.reload()
-    })
-};
+  });
+});
